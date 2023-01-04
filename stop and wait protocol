@@ -82,4 +82,19 @@ public class Receiver extends Thread {
 }
 
 
-OUTPUT :
+OUTPUT :-
+
+// Server ke code me run karna hai
+Enter number of frames : 4
+Enter message : Computer
+Frame 0 is sent
+Ack for :0 is received
+Enter message : Information
+Frame 1 is sent
+Ack for :1 is received
+Enter message : smaart
+Frame 2 is sent
+Ack for :2 is received
+Enter message : Thank you
+Frame 3 is sent
+Ack for :3 is received
