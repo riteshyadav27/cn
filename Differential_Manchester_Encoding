@@ -1,0 +1,100 @@
+// Server side code
+
+import java.io.*;
+import java.net.*;
+
+public class Differential_Manchester_Encoding_Server {
+    public static void main(String[] args) {
+        try {
+            ServerSocket ss = new ServerSocket(6666);
+            Socket s = ss.accept();// establishes connection
+            DataInputStream dis = new DataInputStream(s.getInputStream());
+            String cstr = dis.readUTF();
+            char[] ch = new char[cstr.length()];
+            System.out.println("get " + cstr);
+            for (int i = 0; i < cstr.length(); i++) {
+                ch[i] = cstr.charAt(i);
+            }
+            String mystring = "";
+            if (ch[0] == '1' && ch[1] == '0') {
+                mystring = mystring.concat("1");
+            } else {
+                mystring = mystring.concat("0");
+            }
+            for (int i = 2; i < cstr.length(); i = i + 2) {
+                if ((ch[i - 1] == '0' && ch[i] == '1') || (ch[i - 1] == '1' && ch[i] == '0')) {
+                    mystring = mystring.concat("0");
+                } else if ((ch[i - 1] == '0' && ch[i] == '0') || (ch[i - 1] == '1' && ch[i] == '1')) {
+                    mystring = mystring.concat("1");
+                }
+            }
+            System.out.println("Encoded string is :-- " + cstr);
+            System.out.println("Actual String is :-- " + mystring);
+            ss.close();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+}
+
+// CLient side
+
+import java.io.*;
+import java.net.*;
+import java.util.*;
+
+public class Differential_Manchester_Encoding_Client {
+    public static void main(String[] args) {
+        try {
+            Socket s = new Socket("localhost", 6666);
+            DataOutputStream dout = new DataOutputStream(s.getOutputStream());
+            Scanner sc = new Scanner(System.in);
+            System.out.println("enter the data want to send ");
+            String mystr = sc.nextLine();
+            char[] ch = new char[mystr.length()];
+            for (int i = 0; i < mystr.length(); i++) {
+                ch[i] = mystr.charAt(i);
+            }
+            String str = "";
+            if (ch[0] == '1') {
+                str = str.concat("10");
+            } else {
+                str = str.concat("01");
+            }
+            for (int i = 1; i < mystr.length(); i++) {
+                int curr = str.length() - 1;
+                char cha = str.charAt(curr);
+                if (ch[i] == '1') {
+                    if (cha == '0') {
+                        str = str.concat("01");
+                    } else {
+                        str = str.concat("10");
+                    }
+                } else {
+                    if (cha == '0') {
+                        str = str.concat("10");
+                    } else {
+                        str = str.concat("01");
+                    }
+                }
+            }
+            System.out.println("Actual String is :-- " + mystr);
+            System.out.println("Encoded string is :-- " + str);
+            dout.writeUTF(str);
+            dout.flush();
+            dout.close();
+            s.close();
+            sc.close();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+}
+
+
+Output: -
+
+enter the data want to send 
+101011
+Actual String is :-- 101011
+Encoded string is :-- 101001011001
