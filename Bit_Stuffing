@@ -24,3 +24,9 @@ public class Bit_Stuffing {
         System.out.println("After bit stuffing the string is: "+output);
     }
 }
+
+Output:-
+
+Enter the binary string: 
+1011111110101
+After bit stuffing the string is: 10111110110101
