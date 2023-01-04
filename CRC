@@ -1,71 +1,102 @@
 CRC
 
-#include<stdio.h>
-char data[20],div[20],temp[4],total[100];
-int i,j,datalen,divlen,len,flag=1;
-void check();
+#include <stdio.h>
+#include <string.h>
+
+#define N strlen(gen_poly)
+
+char data[28];
+char check_value[28];
+char gen_poly[10];
+int data_length, i, j;
+
+void XOR()
+{
+
+    for (j = 1; j < N; j++)
+        check_value[j] = ((check_value[j] == gen_poly[j]) ? '0' : '1');
+}
+
+void receiver()
+{
+
+    printf("Enter the received data: ");
+    scanf("%s", data);
+    printf("\n-----------------------------\n");
+    printf("Data received: %s", data);
+
+    crc();
+
+    for (i = 0; (i < N - 1) && (check_value[i] != '1'); i++);
+    if (i < N - 1)
+        printf("\nError detected\n\n");
+    else
+        printf("\nNo error detected\n\n");
+}
+void crc()
+{
+
+    for (i = 0; i < N; i++)
+        check_value[i] = data[i];
+    do
+    {
+        if (check_value[0] == '1')
+            XOR();
+
+        for (j = 0; j < N - 1; j++)
+            check_value[j] = check_value[j + 1];
+
+        check_value[j] = data[i++];
+
+    } while (i <= data_length + N - 1);
+}
+
 int main()
 {
- 	printf("Enter the total bit of data:");    
- 	scanf("%d",&datalen);
- 	printf("\nEnter the total bit of divisor");
- 	scanf("%d",&divlen);
- 	len=datalen+divlen-1;	
- 	printf("\nEnter the data:");
- 	scanf("%s",&data);		      
-    printf("\nEnter the divisor");
-    scanf("%s",div); 
-      
-	for(i=0;i<datalen;i++)
-	{
-		total[i]=data[i]; 
-		temp[i]=data[i]; 		
-	}	  
-	for(i=datalen;i<len;i++)			//padded with zeroes corresponding to divlen 
-        total[i]='0';   
-	check();								// check for crc
- 	for(i=0;i<divlen;i++)	 			// append crc output (remainder) at end of temp 
-	  	temp[i+datalen]=data[i];
- 	printf("\ntransmitted Code Word:%s",temp);	  	
-	printf("\n\nEnter the received code word:");
-    scanf("%s",total); 
- 	check();		 	  
-	for(i=0;i<divlen-1;i++)
-		if(data[i]=='1')
-		{
-			flag=0;
-			break;
-		}		
-	if(flag==1)
-	printf("\nsuccessful!!");
-	else
-	printf("\nreceived code word contains errors...\n");	
-}
-void check()
-{
-    for(j=0;j<divlen;j++)
-        data[j]=total[j];
-    while(j<=len)
-	{
-        if(data[0]=='1')				// in XOR ans remains as it is except in case of 1
-            for(i = 1;i <divlen ; i++)
-   				data[i] = (( data[i] == div[i])?'0':'1');
-        for(i=0;i<divlen-1;i++)			// left shift data word by 1 after div
-            data[i]=data[i+1];
-        data[i]=total[j++];				// replace empty right by total
-    }
+    printf("\nEnter data to be transmitted: ");
+    scanf("%s", data);
+    printf("\n Enter the Generating polynomial: ");
+
+    scanf("%s", gen_poly);
+
+    data_length = strlen(data);
+
+    for (i = data_length; i < data_length + N - 1; i++)
+        data[i] = '0';
+    printf("\n----------------------------------------");
+    printf("\n Data padded with n-1 zeros : %s", data);
+    printf("\n----------------------------------------");
+
+    crc();
+
+    printf("\nCRC or Check value is : %s", check_value);
+
+    for (i = data_length; i < data_length + N - 1; i++)
+        data[i] = check_value[i - data_length];
+    printf("\n----------------------------------------");
+    printf("\n Final data to be sent : %s", data);
+    printf("\n----------------------------------------\n");
+
+    receiver();
+    
+    return 0;
 }
 
+OUTPUT :
+Enter data to be transmitted: 1010101110
 
-Output
-Enter the total bit of data:7
+ Enter the Generating polynomial: 1010
 
-Enter the total bit of divisor4
+----------------------------------------
+ Data padded with n-1 zeros : 1010101110000
+----------------------------------------
+CRC or Check value is : 110
+----------------------------------------
+ Final data to be sent : 1010101110110
+----------------------------------------
+Enter the received data: 10101011101000
 
-Enter the data:1001010
+-----------------------------
+Data received: 10101011101000
+Error detected
 
-Enter the divisor1011
-
-transmitted Code Word:1001010111
-
-Enter the received code word:1001010100
