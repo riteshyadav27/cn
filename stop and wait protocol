@@ -1,73 +1,85 @@
-Stop  and Wait
+//Sender
 
-#include<stdio.h>
-int sender();
-int recv();
-int timer=0,wait_for_ack=-1,frameQ=0,cansend=1,t=0;
- main()
-{
-        int i,j;
-        int frame[5];
-        
-        printf("enter the time when data frame will be ready\n");
-        for(j=0;j<3;j++)
-        {
+import java.io.*;
+import java.net.*;
+import java.util.Scanner;
 
-                sender( i,frame[]);
-                recv(i);
+public class Sender extends Thread {
+    public static void main(String args[]) {
+        int p = 9000, i, q = 8000;
+        String h = "localhost";
+        try {
+            Scanner scanner = new Scanner(System.in);
+            System.out.print("Enter number of frames : ");
+            int number = scanner.nextInt();
+            if (number == 0) {
+                System.out.println("No frame is sent");
+            } else {
+                Socket s2;
+                s2 = new Socket(h, q);
+                DataOutputStream d1 = new DataOutputStream(s2.getOutputStream());
+                d1.write(number);
+            }
+            String str1;
+            for (i = 0; i < number; i++) {
+                System.out.print("Enter message : ");
+                String name = scanner.next();
+                System.out.println("Frame " + i + " is sent");
+                Socket s1;
+                s1 = new Socket(h, p + i);
+                DataOutputStream d = new DataOutputStream(s1.getOutputStream());
+                d.writeUTF(name);
+                DataInputStream dd = new DataInputStream(s1.getInputStream());
+                Integer sss1 = dd.read();
+                System.out.println("Ack for :" + sss1 + " is received");
+            }
+        } catch (Exception ex) {
+            System.out.println("ERROR :" + ex);
         }
-  sender(int i,int frame[])
-                {
-                        wait_for_ack++;
-                        if(wait_for_ack==3)
-                        {
-                
-                        if(i==frame[t])
-                {
-                        frameQ++;
-                        t++;
-                }
-                if(frameQ==0)
-                        printf("NO FRAME TO SEND at time=%d \n",i);
+    }
+}
 
-                if(frameQ>0 && cansend==1)
-                {
-                        printf("FRAME SEND AT TIME=%d\n",i);
-                        cansend=-1;
-                        frameQ--;
-                        timer++;
-                        printf("timer in sender=%d\n",timer);
-                 }
-                if(frameQ>0 && cansend==-1)
-                        printf("FRAME IN Q FOR TRANSMISSION AT TIME=%d\n",i);
-                if(frameQ>0)
-                        t++;
-                        }
-        printf("frameQ=%d\n",frameQ);
-        printf("i=%d     t=%d\n",i,t);
-        printf("value in frame=%d\n",frame[t]);
-        return 0;
+
+//Receiver
+
+import java.io.*;
+import java.net.*;
+import java.util.*;
+
+public class Receiver extends Thread {
+    public void run() {
+        String h = "Serverhost";
+        int q = 5000;
+        int i;
+        try {
+            ServerSocket ss2;
+            ss2 = new ServerSocket(8000);
+            Socket s1 = ss2.accept();
+            DataInputStream dd1 = new DataInputStream(s1.getInputStream());
+            Integer i1 = dd1.read();
+            for (i = 0; i < i1; i++) {
+                ServerSocket ss1;
+                ss1 = new ServerSocket(9000 + i);
+                Socket s = ss1.accept();
+                DataInputStream dd = new DataInputStream(s.getInputStream());
+                String sss1 = dd.readUTF();
+                System.out.println(sss1);
+                System.out.println("Frame " + i + " received");
+                Thread.sleep(4000);
+                DataOutputStream d1 = new DataOutputStream(s.getOutputStream());
+                d1.write(i);
+                System.out.println("ACK sent for " + i);
+            }
+        } catch (Exception ex) {
+            System.out.println("Error" + ex);
         }
+    }
+
+    public static void main(String[] args) {
+        Receiver r = new Receiver();
+        r.start();
+    }
+}
 
 
-
-
-
-       int recv(int i )
-        {   printf("timer in recvr=%d\n",timer);
-                if(timer>0)
-                {
-                        timer++;
-                }
-                        if(timer==3)
-                        {
-                                printf("FRAME ARRIVED AT TIME= %d\n",i);
-                                wait_for_ack=0;
-                                timer=0;
-                        }
-                        else
-                                printf("WAITING FOR FRAME AT TIME %d\n",i);
-                               return 0;
-
-        }
- }
+OUTPUT :
