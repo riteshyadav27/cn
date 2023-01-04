@@ -1,0 +1,38 @@
+package Balagurusamy;
+
+import java.util.Scanner;
+
+public class character_Stuffing {
+    public static void main(String[] args) {
+        System.out.println("Enter the input string: ");
+        Scanner sc = new Scanner(System.in);
+        String a = sc.next();
+
+        System.out.println("Enter the starting delimiter: ");
+        char sd = sc.next().charAt(0);
+        System.out.println("Enter the ending delimiter: ");
+        char ed = sc.next().charAt(0);
+
+        String output = new String();
+        output+=sd;
+        int count = 0;
+        for (int i = 0; i < a.length(); i++) {
+            if (a.charAt(i) == sd || a.charAt(i)==ed) {
+                output = output + a.charAt(i);
+            }
+            output+=a.charAt(i);
+        }
+        output+=ed;
+        System.out.println("After bit stuffing the string is: " + output);
+    }
+}
+
+
+Output:
+Enter the input string: 
+goodday
+Enter the starting delimiter: 
+d
+Enter the ending delimiter: 
+g
+After bit stuffing the string is: dggooddddayg
